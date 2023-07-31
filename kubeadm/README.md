@@ -1,12 +1,12 @@
 # Creating a cluster with kubeadm
 
-Things really helps
+Things really help
 - tmux `set synchronize-panes on`
 - `rsync -a ~/clash-for-linux user@host:/root/`
 
 ## install kubeadm/kubelet/kubectl on all nodes
 
-In China you can use [kubernetes on aliyun](https://developer.aliyun.com/mirror/kubernetes/)
+In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/mirror/kubernetes/)
 
 ```bash
 {
@@ -81,10 +81,12 @@ install [containerd](https://github.com/containerd/containerd) from github relea
 
 ```bash
 {
-wget https://github.com/containerd/containerd/releases/download/v1.7.3/containerd-1.7.3-linux-amd64.tar.gz
-tar Cxzvf /usr/local containerd-1.7.3-linux-amd64.tar.gz
+CONTAINERD_FILE="containerd-1.7.3-linux-amd64.tar.gz"
+wget https://github.com/containerd/containerd/releases/download/v1.7.3/$CONTAINERD_FILE
+tar Cxzvf /usr/local $CONTAINERD_FILE
 mkdir -p /etc/containerd 
 containerd config default > /etc/containerd/config.toml
+rm $CONTAINERD_FILE
 }
 ```
 
@@ -98,7 +100,7 @@ update the config `/etc/containerd/config.toml`
     SystemdCgroup = true
 ```
 
-install [runc](https://github.com/opencontainers/runc) (`apt-get install containerd` will install runc, too)
+install [runc](https://github.com/opencontainers/runc) (`apt-get install containerd` install runc, too)
 
 ```bash
 {
@@ -187,7 +189,7 @@ apiVersion: kubelet.config.k8s.io/v1beta1
 cgroupDriver: systemd
 EOF
 
-kubeadm init --config kubeadm-config.yaml --skip-phases=addon/kube-proxy 
+kubeadm init --config kubeadm-config.yaml
 
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -205,6 +207,12 @@ EOF
 }
 ```
 
+To use Cilium’s [kubeproxy-free functionality](https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/), you can init cluster with the option `skip-phases=addon/kube-proxy`
+
+```
+kubeadm init --config kubeadm-config.yaml --skip-phases=addon/kube-proxy 
+```
+
 ## bootstrap/join all worker nodes
 
 ```bash
@@ -212,9 +220,13 @@ kubeadm join <master>:6443 --token <token> \
         --discovery-token-ca-cert-hash <hash>
 ```
 
+regenerate join command
+
+```bash
+kubeadm token create --print-join-command
+```
 ## teardown
 
 ```bash
 kubeadm reset
-etcdctl del "" --prefix
 ```
