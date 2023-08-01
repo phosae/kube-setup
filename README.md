@@ -4,6 +4,9 @@ the hard way: [Kubernetes The Hard Way](https://github.com/kelseyhightower/kuber
 
 the easy way: [Creating a cluster with kubeadm](./kubeadm/)
 
+development and testing way:
+- [KinD](./kind/README.md), run local Kubernetes clusters using Docker container "nodes"
+
 ## helm cli
 
 on debian/ubuntu
