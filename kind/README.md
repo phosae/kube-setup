@@ -1,4 +1,10 @@
-# KinD (Kubernetes in Docker)
+# [KinD](https://kind.sigs.k8s.io/) (Kubernetes in Docker)
+
+[KinD](https://kind.sigs.k8s.io/) Installation
+
+```bash
+GOBIN=/usr/local/bin/ go install sigs.k8s.io/kind@v0.20.0
+```
 
 run K8s clusters locally with an image registry `localhost:5000`
 
