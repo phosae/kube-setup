@@ -6,6 +6,8 @@ the easy way: [Creating a cluster with kubeadm](./kubeadm/)
 
 development and testing way:
 - [KinD](./kind/README.md), run local Kubernetes clusters using Docker container "nodes"
+- [K3d](./k3d/README.md), run local Kubernetes clusters using Docker container "nodes"
+
 
 ## helm cli
 
