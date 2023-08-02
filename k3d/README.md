@@ -1,30 +1,50 @@
-# K3d (Kubernetes in Docker)
+# [K3D](https://k3d.io/) (K3s in Docker)
 
-run K8s clusters locally with an image registry `localhost:5000`
+Install current latest release
+
+```shell
+wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+```
+
+Install specific release
+
+```shell
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
+```
+
+run K3s clusters locally with an image registry `localhost:5000`
 
 ```shell
 # the shell to immediately exit if any command encounters an execution error.
 set -o errexit 
 
-IMAGE=${IMAGE:rancher/k3s:v1.25.2-k3s1}
+IMAGE=${IMAGE:-rancher/k3s:v1.27.4-k3s1}
+REG_NAME=${REG_NAME:-local-registry}
+REG_PORT=${REG_PORT:-5000}
+CLUSTER_NAME=${CLUSTER_NAME:-k3d}
 
 # create registry container unless it already exists
-reg_name='k3d-registry'
-reg_port='5000'
-cluster_name='k3d'
-if ! k3d registry list | grep -q "${reg_name}"; then
-  k3d registry create "${reg_name}" --port "${reg_port}"
+if ! k3d registry list | grep -q "${REG_NAME}"; then
+  k3d registry create "${REG_NAME}" --port "${REG_PORT}"
 fi
 
-# create a cluster with the local registry enabled in containerd
-cat << EOF | k3d cluster create --config -
-apiVersion: k3d.io/v1alpha4
+# create a cluster with the local registry enabled
+cat << EOF | k3d cluster create --registry-use k3d-${REG_NAME} --config -
+apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
-  name: ${cluster_name}
+  name: ${CLUSTER_NAME}
 servers: 1
 agents: 2
 image: $IMAGE
+registries:
+  use:
+    - k3d-${REG_NAME}:${REG_PORT}
+  config: |
+    mirrors:
+      "localhost:${REG_PORT}":
+        endpoint:
+          - http://k3d-${REG_NAME}:5000
 ports:
 - port: 30000-30100:30000-30100
   nodeFilters:
@@ -37,12 +57,6 @@ options:
       - server:*
 EOF
 
-# connect the registry to the cluster network if not already connected
-if ! k3d registry list | grep -q "${reg_name}"; then
-  k3d registry create "${reg_name}" --port "${reg_port}"
-  k3d registry connect "${cluster_name}" "${reg_name}"
-fi
-
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
@@ -51,22 +65,27 @@ metadata:
   namespace: kube-public
 data:
   localRegistryHosting.v1: |
-    host: "localhost:${reg_port}"
+    host: "localhost:${REG_PORT}"
     help: "https://k3d.io/usage/guides/registries/#using-a-local-registry"
 EOF
+```
 
-cat <<EOF | kubectl create -f -
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    run: app
-  name: app
-spec:
-  containers:
-  - image: ${cluster_name}:${reg_port}/app:v1
-    name: app
-    ports:
-    - containerPort: 80
-EOF
+Verify cluster by Pod creation
+
+```shell
+{
+REG_PORT=${REG_PORT:-5000}
+docker tag nginx:latest localhost:$REG_PORT/mynginx:v0.1
+docker push localhost:$REG_PORT/mynginx:v0.1
+kubectl run mynginx --image localhost:$REG_PORT/mynginx:v0.1
+}
+```
+
+Teardown cluster
+
+```
+{
+CLUSTER_NAME=${CLUSTER_NAME:-k3d}
+k3d cluster delete $CLUSTER_NAME
+}
 ```

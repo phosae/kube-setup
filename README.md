@@ -4,10 +4,9 @@ the hard way: [Kubernetes The Hard Way](https://github.com/kelseyhightower/kuber
 
 the easy way: [Creating a cluster with kubeadm](./kubeadm/)
 
-development and testing way:
-- [KinD](./kind/README.md), run local Kubernetes clusters using Docker container "nodes"
-- [K3d](./k3d/README.md), run local Kubernetes clusters using Docker container "nodes"
-
+development and testing way (local clusters IN Docker):
+- [KinD](./kind/README.md), run Kubernetes using Docker container "nodes"
+- [K3D](./k3d/README.md), run [K3s](https://github.com/k3s-io/k3s/) in Docker
 
 ## helm cli
 
