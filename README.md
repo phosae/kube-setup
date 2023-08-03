@@ -8,6 +8,15 @@ development and testing way (local clusters IN Docker):
 - [KinD](./kind/README.md), run Kubernetes using Docker container "nodes"
 - [K3D](./k3d/README.md), run [K3s](https://github.com/k3s-io/k3s/) in Docker
 
+Pick a network plugin and start play
+- [Calico](./network/calico.md)
+- [flannel](./network/flannel.md)
+- [kindnet](./network/kindnet.md)
+- [cilium](./network/cilium.md)
+
+Multiple CNI support
+- [multus](./network/multus.md)
+
 ## helm cli
 
 on debian/ubuntu

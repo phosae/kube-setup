@@ -44,6 +44,7 @@ nodes:
 networking:
   podSubnet: "10.244.0.0/16"
   serviceSubnet: "10.96.0.0/12"
+  disableDefaultCNI: false # the default CNI will not be installed if it is configured to true
 EOF
 
 # connect the registry to the cluster network if not already connected
