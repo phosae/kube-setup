@@ -66,7 +66,7 @@ sudo sysctl --system
 Verify that the br_netfilter, overlay modules are loaded,
 the `net.bridge.bridge-nf-call-iptables`, `net.bridge.bridge-nf-call-ip6tables`, and `net.ipv4.ip_forward` system variables are set to 1
 
-```
+```shell
 {
 lsmod | grep br_netfilter
 lsmod | grep overlay
@@ -100,12 +100,17 @@ update the config `/etc/containerd/config.toml`
     SystemdCgroup = true
 ```
 
+```bash
+containerd config default | sed -r  's|registry.k8s.io/pause:(.*)"|registry.aliyuncs.com/google_containers/pause:\1"|' | sed -r 's|SystemdCgroup(.*)false$|SystemdCgroup\1true"|'  > /etc/containerd/config.toml
+```
+
 install [runc](https://github.com/opencontainers/runc) (`apt-get install containerd` install runc, too)
 
 ```bash
 {
 wget https://github.com/opencontainers/runc/releases/download/v1.1.8/runc.amd64
 install -m 755 runc.amd64 /usr/local/bin/runc
+rm runc.amd64
 }
 ```
 
@@ -196,14 +201,6 @@ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl taint node --all node-role.kubernetes.io/control-plane:NoSchedule-
-
-cat <<EOF >> .bashrc
-source <(kubectl completion bash)
-alias k='kubectl'
-complete -o default -F __start_kubectl k
-alias ks='kubectl -n kube-system'
-complete -o default -F __start_kubectl ks
-EOF
 }
 ```
 
@@ -211,6 +208,21 @@ To use Cilium’s [kubeproxy-free functionality](https://docs.cilium.io/en/stabl
 
 ```
 kubeadm init --config kubeadm-config.yaml --skip-phases=addon/kube-proxy 
+```
+
+make some shorthand alias for `kubectl`
+
+```bash
+{
+cat <<EOF >> ~/.bashrc
+source <(kubectl completion bash)
+alias k='kubectl'
+complete -o default -F __start_kubectl k
+alias ks='kubectl -n kube-system'
+complete -o default -F __start_kubectl ks
+EOF
+source ~/.bashrc
+}
 ```
 
 ## bootstrap/join all worker nodes
@@ -225,8 +237,42 @@ regenerate join command
 ```bash
 kubeadm token create --print-join-command
 ```
+
+## result
+
+After running the `kubeadm init` and `kubeadm join` processes, the cluster looks like this
+
+```
+root@master:~# kubectl get nodes
+NAME              STATUS     ROLES           AGE   VERSION
+master   NotReady   control-plane   28s   v1.27.4
+worker   NotReady   <none>          7s    v1.27.4
+root@master:~# kubectl get po -A
+NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
+kube-system   coredns-7bdc4cb885-g4wp2                  0/1     Pending   0          19s
+kube-system   coredns-7bdc4cb885-gqlkj                  0/1     Pending   0          19s
+kube-system   etcd-master                               1/1     Running   3          34s
+kube-system   kube-apiserver-master                     1/1     Running   3          34s
+kube-system   kube-controller-manager-master            1/1     Running   0          34s
+kube-system   kube-proxy-4jqks                          1/1     Running   0          13s
+kube-system   kube-proxy-4mfrg                          1/1     Running   0          19s
+kube-system   kube-scheduler-master                     1/1     Running   3          33s
+```
+
+The Nodes and CoreDNS Pods are not ready because the [Network Plugins](https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/) are not installed.
+
+You can refer to the [network section](../network/) and choose a Network Plugin to install. 
+
+Once you have chosen and installed a Network Plugin, it will configure the pod networking and make the Nodes and Pods ready.
+
 ## teardown
 
 ```bash
 kubeadm reset
+```
+
+The reset process does not clean CNI configuration. To do so, you must remove `/etc/cni/net.d`
+
+```shell
+rm /etc/cni/net.d/*
 ```
