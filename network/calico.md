@@ -6,6 +6,7 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1
 
 cat << EOF |  kubectl create -f -
 # This section includes base Calico installation configuration.
+apiVersion: operator.tigera.io/v1
 kind: Installation
 metadata:
   name: default
