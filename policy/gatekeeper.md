@@ -7,6 +7,17 @@ helm install gatekeeper/gatekeeper --version 3.12.0 --name-template=gatekeeper -
 }
 ```
 
+uninstall
+
+```bash
+helm uninstall gatekeeper --namespace gatekeeper-system
+```
+
+<!--ts-->
+   * [Trick calico’s CNI conf name from 10-calico.conflist to30-calico.conflist](#trick-calicos-cni-conf-name-from-10-calicoconflist-to30-calicoconflist)
+   * [Swap Pod Image](#swap-pod-image)
+<!--te-->
+
 ## Trick calico’s CNI conf name from 10-calico.conflist to30-calico.conflist
 
 ```yaml
@@ -80,10 +91,4 @@ spec:
       subPath: spec.containers[name:*].env[name:ACORN_IMAGE].value
     assign:
       value: docker.io/zengxu/acorn:v0.7.1
-```
-
-## Uninstall
-
-```bash
-helm uninstall gatekeeper --namespace gatekeeper-system
 ```

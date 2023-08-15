@@ -1,3 +1,17 @@
+<!--ts-->
+* [Creating a cluster with kubeadm](#creating-a-cluster-with-kubeadm)
+   * [install kubeadm/kubelet/kubectl on all nodes](#install-kubeadmkubeletkubectl-on-all-nodes)
+   * [setup Container Runtime on all nodes](#setup-container-runtime-on-all-nodes)
+      * [[prerequisites] Forwarding IPv4 and letting iptables see bridged traffic](#prerequisites-forwarding-ipv4-and-letting-iptables-see-bridged-traffic)
+      * [containerd and runc (or crun/youki, etc)](#containerd-and-runc-or-crunyouki-etc)
+      * [[experimental] replace runc with <a href="https://github.com/containers/youki">youki</a>](#experimental-replace-runc-with-youki)
+      * [bootstrap containerd](#bootstrap-containerd)
+   * [bootstrap/init control plane](#bootstrapinit-control-plane)
+   * [bootstrap/join all worker nodes](#bootstrapjoin-all-worker-nodes)
+   * [result](#result)
+   * [teardown](#teardown)
+<!--te-->
+
 # Creating a cluster with kubeadm
 
 Things really help
