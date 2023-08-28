@@ -61,6 +61,9 @@ spec:
   match:
     scope: Namespaced
     namespaces: ["acorn*"]
+    #labelSelector:
+    #  matchExpressions:
+    #  - {"key": "app", "operator": "In", "values": ["db", "app", "web"]}
     kinds:
     - apiGroups: [ "*" ]
       kinds: ["Pod"]
