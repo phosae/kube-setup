@@ -32,7 +32,7 @@ EOF
 }
 ```
 
-Multiple calico networks are only support in Calico Cloud and Calico Enterprise, the community version only supports [IPPools migration](https://docs.tigera.io/calico/latest/networking/ipam/migrate-pools).
+Multiple calico networks are only supported in Calico Cloud and Calico Enterprise, the community version only supports [IPPools migration](https://docs.tigera.io/calico/latest/networking/ipam/migrate-pools).
 
 ```
 cat << EOF | k apply -f -
@@ -71,6 +71,8 @@ spec:
   natOutgoing: true
 EOF
 ```
+
+The network CIDR and cluster mode can be switched by setting the `spec.disabled` field of multiple IPPools.
 
 For example, by disabling the IP pool `default-ipv4-ippool` and enabling another IP pool, the cluster network can switch between VXLAN mode, IPIP mode, and BGP mode.
 
