@@ -21,6 +21,6 @@ and make master nodes schedulable
 ```bash
 {
 curl -s https://raw.githubusercontent.com/phosae/kube-setup/master/kind/kind-up.sh | bash
-kubectl taint node --all node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl taint node -l node-role.kubernetes.io/control-plane node-role.kubernetes.io/control-plane:NoSchedule-
 }
 ```
