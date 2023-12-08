@@ -1,22 +1,33 @@
 # [K3D](https://k3d.io/) (K3s in Docker)
 
-Install current latest release
-
-```shell
-wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
-```
-
 Install specific release
 
 ```shell
 curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
 ```
 
-run K3s clusters locally with an image registry `localhost:5000`
+Install current latest release
 
 ```shell
-# the shell to immediately exit if any command encounters an execution error.
-set -o errexit 
+wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+```
+
+Install kubectl if it is not already installed on the machine
+
+```shell
+{
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.27.4/bin/linux/amd64/kubectl
+chmod +x /usr/local/bin/kubectl
+}
+```
+
+script that run K3s clusters locally with an image registry `localhost:5000`
+
+```bash
+{
+cat <<\EOF | tee k3d-up.sh
+#!/bin/bash
+set -o errexit
 
 IMAGE=${IMAGE:-rancher/k3s:v1.27.4-k3s1}
 REG_NAME=${REG_NAME:-local-registry}
@@ -29,7 +40,7 @@ if ! k3d registry list | grep -q "${REG_NAME}"; then
 fi
 
 # create a cluster with the local registry enabled
-cat << EOF | k3d cluster create --registry-use k3d-${REG_NAME} --config -
+cat << EOT | k3d cluster create --registry-use k3d-${REG_NAME} --config -
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 metadata:
@@ -55,9 +66,9 @@ options:
     - arg: --disable=traefik
       nodeFilters:
       - server:*
-EOF
+EOT
 
-cat <<EOF | kubectl apply -f -
+cat <<EOT | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -67,7 +78,18 @@ data:
   localRegistryHosting.v1: |
     host: "localhost:${REG_PORT}"
     help: "https://k3d.io/usage/guides/registries/#using-a-local-registry"
+EOT
+
 EOF
+
+chmod +x k3d-up.sh
+}
+```
+
+Run the script
+
+```bash
+./k3d-up
 ```
 
 Verify cluster by Pod creation

@@ -6,9 +6,21 @@
 GOBIN=/usr/local/bin/ go install sigs.k8s.io/kind@v0.20.0
 ```
 
-run K8s clusters locally with an image registry `localhost:5000`
+Install kubectl if it is not already installed on the machine
 
 ```shell
+{
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.27.4/bin/linux/amd64/kubectl
+chmod +x /usr/local/bin/kubectl
+}
+```
+
+script that run K8s clusters locally with an image registry `localhost:5000`
+
+```bash
+{
+cat <<\EOF | tee kind-up.sh
+#!/bin/bash
 set -o errexit
 
 IMAGE=${IMAGE:-kindest/node:v1.27.3}
@@ -23,7 +35,7 @@ if [ "$(docker inspect -f '{{.State.Running}}' "${reg_name}" 2>/dev/null || true
 fi
 
 # create a cluster with the local registry enabled in containerd
-cat << EOF | kind create cluster --config -
+cat << EOT | kind create cluster --config -
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 name: kind
@@ -45,14 +57,14 @@ networking:
   podSubnet: "10.244.0.0/16"
   serviceSubnet: "10.96.0.0/12"
   disableDefaultCNI: false # the default CNI will not be installed if it is configured to true
-EOF
+EOT
 
 # connect the registry to the cluster network if not already connected
 if [ "$(docker inspect -f='{{json .NetworkSettings.Networks.kind}}' "${reg_name}")" = 'null' ]; then
   docker network connect "kind" "${reg_name}"
 fi
 
-cat <<EOF | kubectl apply -f -
+cat <<EOT | kubectl apply -f -
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -62,7 +74,18 @@ data:
   localRegistryHosting.v1: |
     host: "localhost:${reg_port}"
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
-EOF
+EOT
 
+EOF
+chmod +x kind-up.sh
+}
+```
+
+run the script
+
+```bash
+{
+./kind-up.sh
 kubectl taint node --all node-role.kubernetes.io/control-plane:NoSchedule-
+}
 ```
