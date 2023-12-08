@@ -10,7 +10,7 @@ Install kubectl if it is not already installed on the machine
 
 ```shell
 {
-wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.27.4/bin/linux/amd64/kubectl
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.28.4/bin/linux/amd64/kubectl
 chmod +x /usr/local/bin/kubectl
 }
 ```
@@ -23,7 +23,7 @@ cat <<\EOF | tee kind-up.sh
 #!/bin/bash
 set -o errexit
 
-IMAGE=${IMAGE:-kindest/node:v1.27.3}
+IMAGE=${IMAGE:-kindest/node:v1.28.0}
 
 # create registry container unless it already exists
 reg_name='kind-registry'

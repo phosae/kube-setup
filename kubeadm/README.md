@@ -1,15 +1,17 @@
 <!--ts-->
-* [Creating a cluster with kubeadm](#creating-a-cluster-with-kubeadm)
-   * [install kubeadm/kubelet/kubectl on all nodes](#install-kubeadmkubeletkubectl-on-all-nodes)
-   * [setup Container Runtime on all nodes](#setup-container-runtime-on-all-nodes)
-      * [[prerequisites] Forwarding IPv4 and letting iptables see bridged traffic](#prerequisites-forwarding-ipv4-and-letting-iptables-see-bridged-traffic)
-      * [containerd and runc (or crun/youki, etc)](#containerd-and-runc-or-crunyouki-etc)
-      * [[experimental] replace runc with <a href="https://github.com/containers/youki">youki</a>](#experimental-replace-runc-with-youki)
-      * [bootstrap containerd](#bootstrap-containerd)
-   * [bootstrap/init control plane](#bootstrapinit-control-plane)
-   * [bootstrap/join all worker nodes](#bootstrapjoin-all-worker-nodes)
-   * [result](#result)
-   * [teardown](#teardown)
+- [Creating a cluster with kubeadm](#creating-a-cluster-with-kubeadm)
+  - [install kubeadm/kubelet/kubectl on all nodes](#install-kubeadmkubeletkubectl-on-all-nodes)
+    - [install binary with curl](#install-binary-with-curl)
+    - [install using native package management](#install-using-native-package-management)
+  - [setup Container Runtime on all nodes](#setup-container-runtime-on-all-nodes)
+    - [\[prerequisites\] Forwarding IPv4 and letting iptables see bridged traffic](#prerequisites-forwarding-ipv4-and-letting-iptables-see-bridged-traffic)
+    - [containerd and runc (or crun/youki, etc)](#containerd-and-runc-or-crunyouki-etc)
+    - [\[experimental\] replace runc with youki](#experimental-replace-runc-with-youki)
+    - [bootstrap containerd](#bootstrap-containerd)
+  - [bootstrap/init control plane](#bootstrapinit-control-plane)
+  - [bootstrap/join all worker nodes](#bootstrapjoin-all-worker-nodes)
+  - [result](#result)
+  - [teardown](#teardown)
 <!--te-->
 
 # Creating a cluster with kubeadm
@@ -20,31 +22,51 @@ Things really help
 
 ## install kubeadm/kubelet/kubectl on all nodes
 
-In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/mirror/kubernetes/)
+### install binary with curl
 
 ```bash
-{
-apt-get update && apt-get install -y apt-transport-https
-curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-EOF
-apt-get update
-apt-get install -y kubelet kubeadm kubectl
-}
+for kubebin in kubelet kubeadm kubectl; do
+    curl -LO "https://dl.k8s.io/release/v1.28.4/bin/linux/amd64/$kubebin"
+    chmod +x $kubebin
+    mv $kubebin /usr/local/bin/$kubebin
+done
 ```
 
-Otherwise just follow official steps
+In China you can use [DaoCloud's public-binary-files-mirror](https://github.com/DaoCloud/public-binary-files-mirror)
+
+```bash
+for kubebin in kubelet kubeadm kubectl; do
+    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.28.4/bin/linux/amd64/$kubebin"
+    chmod +x $kubebin
+    mv $kubebin /usr/local/bin/$kubebin
+done
+```
+
+### install using native package management
 
 ```bash
 {
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
-curl -fsSL https://dl.k8s.io/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
-sudo apt-mark hold kubelet kubeadm kubectl
+}
+```
+
+In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/mirror/kubernetes/)
+
+```bash
+{
+apt-get update && apt-get install -y apt-transport-https ca-certificates curl
+curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
+cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
+deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
+EOF
+apt-get update
+apt-get install -y kubelet=1.28.2-00 kubeadm=1.28.2-00 kubectl=1.28.2-00
 }
 ```
 
@@ -95,8 +117,8 @@ install [containerd](https://github.com/containerd/containerd) from github relea
 
 ```bash
 {
-CONTAINERD_FILE="containerd-1.7.3-linux-amd64.tar.gz"
-wget https://github.com/containerd/containerd/releases/download/v1.7.3/$CONTAINERD_FILE
+CONTAINERD_FILE="containerd-1.7.9-linux-amd64.tar.gz"
+wget https://github.com/containerd/containerd/releases/download/v1.7.9/$CONTAINERD_FILE
 tar Cxzvf /usr/local $CONTAINERD_FILE
 mkdir -p /etc/containerd 
 containerd config default > /etc/containerd/config.toml
@@ -122,7 +144,7 @@ install [runc](https://github.com/opencontainers/runc) (`apt-get install contain
 
 ```bash
 {
-wget https://github.com/opencontainers/runc/releases/download/v1.1.8/runc.amd64
+wget https://github.com/opencontainers/runc/releases/download/v1.1.10/runc.amd64
 install -m 755 runc.amd64 /usr/local/bin/runc
 rm runc.amd64
 }
@@ -143,11 +165,11 @@ sudo apt-get install  -y  \
       libssl-dev
 
 sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
-wget https://github.com/containers/youki/releases/download/v0.1.0/youki_0_1_0_linux.tar.gz
-tar -zxvf youki_0_1_0_linux.tar.gz youki_0_1_0_linux/youki-0.1.0/youki
-sudo chmod 755 youki_0_1_0_linux/youki-0.1.0/youki
-mv youki_0_1_0_linux/youki-0.1.0/youki /usr/local/bin/runc
-rm -rf youki_0_1_0_linux.tar.gz youki_0_1_0_linux
+wget https://github.com/containers/youki/releases/download/v0.3.0/youki_0_3_0_linux.tar.gz
+tar -zxvf youki_0_3_0_linux.tar.gz youki_0_3_0_linux/youki-0.3.0/youki
+sudo chmod 755 youki_0_3_0_linux/youki-0.3.0/youki
+mv youki_0_3_0_linux/youki-0.3.0/youki /usr/local/bin/runc
+rm -rf youki_0_3_0_linux.tar.gz youki_0_3_0_linux
 }
 ```
 
@@ -259,8 +281,8 @@ After running the `kubeadm init` and `kubeadm join` processes, the cluster looks
 ```
 root@master:~# kubectl get nodes
 NAME              STATUS     ROLES           AGE   VERSION
-master   NotReady   control-plane   28s   v1.27.4
-worker   NotReady   <none>          7s    v1.27.4
+master   NotReady   control-plane   28s   v1.28.4
+worker   NotReady   <none>          7s    v1.28.4
 root@master:~# kubectl get po -A
 NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
 kube-system   coredns-7bdc4cb885-g4wp2                  0/1     Pending   0          19s

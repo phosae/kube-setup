@@ -3,7 +3,7 @@
 Install specific release
 
 ```shell
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.5.1 bash
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.6.0 bash
 ```
 
 Install current latest release
@@ -16,7 +16,7 @@ Install kubectl if it is not already installed on the machine
 
 ```shell
 {
-wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.27.4/bin/linux/amd64/kubectl
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.28.4/bin/linux/amd64/kubectl
 chmod +x /usr/local/bin/kubectl
 }
 ```
@@ -29,7 +29,7 @@ cat <<\EOF | tee k3d-up.sh
 #!/bin/bash
 set -o errexit
 
-IMAGE=${IMAGE:-rancher/k3s:v1.27.4-k3s1}
+IMAGE=${IMAGE:-rancher/k3s:v1.28.4-k3s2}
 REG_NAME=${REG_NAME:-local-registry}
 REG_PORT=${REG_PORT:-5000}
 CLUSTER_NAME=${CLUSTER_NAME:-k3d}
