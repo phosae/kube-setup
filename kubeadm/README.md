@@ -218,7 +218,7 @@ systemctl daemon-reload && systemctl enable containerd && systemctl start contai
 cat <<EOF | tee kubeadm-config.yaml
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1beta3
-kubernetesVersion: v1.27.4
+kubernetesVersion: v1.28.4
 imageRepository: registry.aliyuncs.com/google_containers
 networking:
   dnsDomain: cluster.local
