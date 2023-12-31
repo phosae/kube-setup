@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit
 
-IMAGE=${IMAGE:-rancher/k3s:v1.28.4-k3s2}
+IMAGE=${IMAGE:-rancher/k3s:v1.29.0-k3s1}
 REG_NAME=${REG_NAME:-local-registry}
 REG_PORT=${REG_PORT:-5000}
 CLUSTER_NAME=${CLUSTER_NAME:-k3d}
