@@ -61,10 +61,8 @@ In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/
 ```bash
 {
 apt-get update && apt-get install -y apt-transport-https ca-certificates curl
-curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-EOF
+curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/aliyun-kubernetes.gpg 
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/aliyun-kubernetes.gpg] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/aliyun-kubernetes.list
 apt-get update
 apt-get install -y kubelet=1.28.2-00 kubeadm=1.28.2-00 kubectl=1.28.2-00
 }
