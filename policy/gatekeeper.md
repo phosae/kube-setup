@@ -18,6 +18,8 @@ helm uninstall gatekeeper --namespace gatekeeper-system
    * [Swap Pod Image](#swap-pod-image)
 <!--te-->
 
+Mutation Limits: see [issue 3269: Mutation Enhancements](https://github.com/open-policy-agent/gatekeeper/issues/3269)
+
 ## Trick calico’s CNI conf name from 10-calico.conflist to30-calico.conflist
 
 ```yaml
