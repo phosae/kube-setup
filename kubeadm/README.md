@@ -26,7 +26,7 @@ Things really help
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://dl.k8s.io/release/v1.28.4/bin/linux/amd64/$kubebin"
+    curl -LO "https://dl.k8s.io/release/v1.29.3/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -36,7 +36,7 @@ In China you can use [DaoCloud's public-binary-files-mirror](https://github.com/
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.28.4/bin/linux/amd64/$kubebin"
+    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.29.3/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -49,8 +49,8 @@ done
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 }
@@ -61,10 +61,10 @@ In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/
 ```bash
 {
 apt-get update && apt-get install -y apt-transport-https ca-certificates curl
-curl -fsSL https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/aliyun-kubernetes.gpg 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/aliyun-kubernetes.gpg] https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/aliyun-kubernetes.list
+curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-aliyun.gpg 
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/kubernetes-aliyun.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.29/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes-aliyun.list
 apt-get update
-apt-get install -y kubelet=1.28.2-00 kubeadm=1.28.2-00 kubectl=1.28.2-00
+apt-get install -y kubelet=1.29.3-1.1 kubeadm=1.29.3-1.1 kubectl=1.29.3-1.1
 }
 ```
 
@@ -115,8 +115,8 @@ install [containerd](https://github.com/containerd/containerd) from github relea
 
 ```bash
 {
-CONTAINERD_FILE="containerd-1.7.9-linux-amd64.tar.gz"
-wget https://github.com/containerd/containerd/releases/download/v1.7.9/$CONTAINERD_FILE
+CONTAINERD_FILE="containerd-1.7.14-linux-amd64.tar.gz"
+wget https://github.com/containerd/containerd/releases/download/v1.7.14/$CONTAINERD_FILE
 tar Cxzvf /usr/local $CONTAINERD_FILE
 mkdir -p /etc/containerd 
 containerd config default > /etc/containerd/config.toml
@@ -135,14 +135,14 @@ update the config `/etc/containerd/config.toml`
 ```
 
 ```bash
-containerd config default | sed -r  's|registry.k8s.io/pause:(.*)"|registry.aliyuncs.com/google_containers/pause:\1"|' | sed -r 's|SystemdCgroup(.*)false$|SystemdCgroup\1true"|'  > /etc/containerd/config.toml
+containerd config default | sed -r  's|registry.k8s.io/pause:(.*)"|registry.aliyuncs.com/google_containers/pause:\1"|' | sed -r 's|SystemdCgroup(.*)false$|SystemdCgroup\1true|'  > /etc/containerd/config.toml
 ```
 
 install [runc](https://github.com/opencontainers/runc) (`apt-get install containerd` install runc, too)
 
 ```bash
 {
-wget https://github.com/opencontainers/runc/releases/download/v1.1.10/runc.amd64
+wget https://github.com/opencontainers/runc/releases/download/v1.1.12/runc.amd64
 install -m 755 runc.amd64 /usr/local/bin/runc
 rm runc.amd64
 }
@@ -163,11 +163,11 @@ sudo apt-get install  -y  \
       libssl-dev
 
 sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
-wget https://github.com/containers/youki/releases/download/v0.3.0/youki_0_3_0_linux.tar.gz
-tar -zxvf youki_0_3_0_linux.tar.gz youki_0_3_0_linux/youki-0.3.0/youki
-sudo chmod 755 youki_0_3_0_linux/youki-0.3.0/youki
-mv youki_0_3_0_linux/youki-0.3.0/youki /usr/local/bin/runc
-rm -rf youki_0_3_0_linux.tar.gz youki_0_3_0_linux
+wget https://github.com/containers/youki/releases/download/v0.3.2/youki-0.3.2-x86_64-musl.tar.gz
+mkdir youki-0.3.2 && tar -zxvf youki-0.3.2-x86_64-musl.tar.gz -C youki-0.3.2 
+sudo chmod 755 youki-0.3.2/youki
+mv youki-0.3.2/youki /usr/local/bin/runc
+rm -rf youki-0.3.2-x86_64-musl.tar.gz youki-0.3.2
 }
 ```
 
@@ -216,7 +216,7 @@ systemctl daemon-reload && systemctl enable containerd && systemctl start contai
 cat <<EOF | tee kubeadm-config.yaml
 kind: ClusterConfiguration
 apiVersion: kubeadm.k8s.io/v1beta3
-kubernetesVersion: v1.28.4
+kubernetesVersion: v1.29.3
 imageRepository: registry.aliyuncs.com/google_containers
 networking:
   dnsDomain: cluster.local
@@ -279,8 +279,8 @@ After running the `kubeadm init` and `kubeadm join` processes, the cluster looks
 ```
 root@master:~# kubectl get nodes
 NAME              STATUS     ROLES           AGE   VERSION
-master   NotReady   control-plane   28s   v1.28.4
-worker   NotReady   <none>          7s    v1.28.4
+master   NotReady   control-plane   28s   v1.29.3
+worker   NotReady   <none>          7s    v1.29.3
 root@master:~# kubectl get po -A
 NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
 kube-system   coredns-7bdc4cb885-g4wp2                  0/1     Pending   0          19s
