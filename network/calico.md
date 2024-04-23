@@ -2,7 +2,7 @@
 
 ```bash
 {
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.27.3/manifests/tigera-operator.yaml
 
 cat << EOF |  kubectl create -f -
 # This section includes base Calico installation configuration.
