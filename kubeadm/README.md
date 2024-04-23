@@ -26,7 +26,7 @@ Things really help
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://dl.k8s.io/release/v1.29.3/bin/linux/amd64/$kubebin"
+    curl -LO "https://dl.k8s.io/release/v1.29.4/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -36,7 +36,7 @@ In China you can use [DaoCloud's public-binary-files-mirror](https://github.com/
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.29.3/bin/linux/amd64/$kubebin"
+    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.29.4/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -64,7 +64,7 @@ apt-get update && apt-get install -y apt-transport-https ca-certificates curl
 curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.29/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-aliyun.gpg 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/kubernetes-aliyun.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.29/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes-aliyun.list
 apt-get update
-apt-get install -y kubelet=1.29.3-1.1 kubeadm=1.29.3-1.1 kubectl=1.29.3-1.1
+apt-get install -y kubelet=1.29.4-2.1 kubeadm=1.29.4-2.1 kubectl=1.29.4-2.1
 }
 ```
 

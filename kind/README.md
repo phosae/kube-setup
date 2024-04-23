@@ -10,7 +10,7 @@ Install kubectl if it is not already installed on the machine
 
 ```shell
 {
-wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.29.3/bin/linux/amd64/kubectl
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.29.4/bin/linux/amd64/kubectl
 chmod +x /usr/local/bin/kubectl
 }
 ```
