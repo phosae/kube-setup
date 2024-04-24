@@ -228,6 +228,12 @@ networking:
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 cgroupDriver: systemd
+systemReserved:
+  cpu: 2000m
+  memory: 2Gi
+kubeReserved:
+  cpu: 1500m
+  memory: 1Gi
 EOF
 
 kubeadm init --config kubeadm-config.yaml
