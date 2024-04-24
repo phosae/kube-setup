@@ -11,7 +11,6 @@ kind: Installation
 metadata:
   name: default
 spec:
-  # Configures Calico networking.
   calicoNetwork:
     bgp: Enabled   # Enabled, Disabled
     # Note: The ipPools section cannot be modified post-install.
@@ -21,6 +20,16 @@ spec:
       encapsulation: VXLAN # IPIP, VXLAN, IPIPCrossSubnet, VXLANCrossSubnet, None
       natOutgoing: Enabled
       nodeSelector: all()
+  calicoNodeDaemonSet:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: calico-node
+            resources:
+              limits:
+                cpu: 500m
+                memory: 500Mi
 ---
 # This section configures the Calico API server.
 apiVersion: operator.tigera.io/v1
