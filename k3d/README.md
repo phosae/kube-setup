@@ -3,10 +3,10 @@
 install specific release
 
 ```shell
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.6.0 bash
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.6.3 bash
 ```
 
-install current latest release
+install latest release
 
 ```shell
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
@@ -16,7 +16,7 @@ install kubectl if it is not already installed on the machine
 
 ```shell
 {
-wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.29.4/bin/linux/amd64/kubectl
+wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.30.0/bin/linux/amd64/kubectl
 chmod +x /usr/local/bin/kubectl
 }
 ```
