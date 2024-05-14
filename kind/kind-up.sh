@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit
 
-IMAGE=${IMAGE:-kindest/node:v1.29.2}
+IMAGE=${IMAGE:-kindest/node:v1.30.0}
 
 # create registry container unless it already exists
 reg_name='kind-registry'
@@ -22,8 +22,7 @@ containerdConfigPatches:
   [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:${reg_port}"]
     endpoint = ["http://${reg_name}:5000"]
 featureGates:
-  "ValidatingAdmissionPolicy": true          # alpha 1.26, 1.27, beta 1.28
-  "UserNamespacesSupport": true # alpha 1.25, named UserNamespacesStatelessPodsSupport before 1.28
+  "UserNamespacesSupport": true # beta 1.30
   "NFTablesProxyMode": true # alpha 1.29
 runtimeConfig:
   "api/all": true # enable all built-in APIs
