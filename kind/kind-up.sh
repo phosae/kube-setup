@@ -1,7 +1,7 @@
 #!/bin/bash
 set -o errexit
 
-IMAGE=${IMAGE:-kindest/node:v1.30.0}
+IMAGE=${IMAGE:-kindest/node:v1.31.2}
 
 # create registry container unless it already exists
 reg_name='kind-registry'

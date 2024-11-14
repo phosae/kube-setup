@@ -26,7 +26,7 @@ Things really help
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/$kubebin"
+    curl -LO "https://dl.k8s.io/release/v1.31.2/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -36,7 +36,7 @@ In China you can use [DaoCloud's public-binary-files-mirror](https://github.com/
 
 ```bash
 for kubebin in kubelet kubeadm kubectl; do
-    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.30.0/bin/linux/amd64/$kubebin"
+    curl -LO "https://files.m.daocloud.io/dl.k8s.io/release/v1.31.2/bin/linux/amd64/$kubebin"
     chmod +x $kubebin
     mv $kubebin /usr/local/bin/$kubebin
 done
@@ -49,10 +49,10 @@ done
 sudo apt-get update
 sudo apt-get install -y apt-transport-https ca-certificates curl
 mkdir -p /etc/apt/keyrings
-curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
-sudo apt-get install -y kubelet=1.30.0-1.1 kubeadm=1.30.0-1.1 kubectl=1.30.0-1.1
+sudo apt-get install -y kubelet=1.31.2-1.1 kubeadm=1.31.2-1.1 kubectl=1.31.2-1.1
 }
 ```
 
@@ -61,10 +61,10 @@ In China you can use [Kubernetes mirror on Aliyun](https://developer.aliyun.com/
 ```bash
 {
 apt-get update && apt-get install -y apt-transport-https ca-certificates curl
-curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-aliyun.gpg 
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/kubernetes-aliyun.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.30/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes-aliyun.list
+curl -fsSL https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-aliyun.gpg 
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/kubernetes-aliyun.gpg] https://mirrors.aliyun.com/kubernetes-new/core/stable/v1.31/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes-aliyun.list
 apt-get update
-apt-get install -y kubelet=1.30.0-1.1 kubeadm=1.30.0-1.1 kubectl=1.30.0-1.1
+apt-get install -y kubelet=1.31.2-1.1 kubeadm=1.31.2-1.1 kubectl=1.31.2-1.1
 }
 ```
 
@@ -115,8 +115,8 @@ install [containerd](https://github.com/containerd/containerd) from github relea
 
 ```bash
 {
-CONTAINERD_FILE="containerd-1.7.15-linux-amd64.tar.gz"
-wget https://github.com/containerd/containerd/releases/download/v1.7.15/$CONTAINERD_FILE
+CONTAINERD_FILE="containerd-2.0.0-linux-amd64.tar.gz"
+wget https://github.com/containerd/containerd/releases/download/v2.0.0/$CONTAINERD_FILE
 tar Cxzvf /usr/local $CONTAINERD_FILE
 mkdir -p /etc/containerd 
 containerd config default > /etc/containerd/config.toml
@@ -124,29 +124,29 @@ rm $CONTAINERD_FILE
 }
 ```
 
-update the config `/etc/containerd/config.toml`
+In China, you can replace the sandbox image with an available mirror registry
 
 ```bash
-containerd config default | sed -r  's|registry.k8s.io/pause:(.*)"|registry.aliyuncs.com/google_containers/pause:\1"|' | sed -r 's|SystemdCgroup(.*)false$|SystemdCgroup\1true|'  > /etc/containerd/config.toml
+containerd config default | sed -r  's|registry.k8s.io/pause:(.*)|registry.aliyuncs.com/google_containers/pause:\1|' > /etc/containerd/config.toml
 ```
 
 the `/etc/containerd/config.toml` will look like this
 
 ```toml
-[plugins."io.containerd.grpc.v1.cri"]
-  sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.9"
-[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-    SystemdCgroup = true
+[plugins]
+  [plugins.'io.containerd.cri.v1.images']
+    snapshotter = 'overlayfs'
+
+    [plugins.'io.containerd.cri.v1.images'.pinned_images]
+      sandbox = 'registry.aliyuncs.com/google_containers/pause:3.10'
 ```
 
 install [runc](https://github.com/opencontainers/runc) (`apt-get install containerd` install runc, too)
 
 ```bash
 {
-wget https://github.com/opencontainers/runc/releases/download/v1.1.12/runc.amd64
+wget https://github.com/opencontainers/runc/releases/download/v1.2.1/runc.amd64
 install -m 755 runc.amd64 /usr/local/bin/runc
-rm runc.amd64
 }
 ```
 
@@ -165,11 +165,11 @@ sudo apt-get install  -y  \
       libssl-dev
 
 sudo rm -f /usr/bin/runc /usr/local/bin/runc /usr/sbin/runc
-wget https://github.com/containers/youki/releases/download/v0.3.2/youki-0.3.2-x86_64-musl.tar.gz
-mkdir youki-0.3.2 && tar -zxvf youki-0.3.2-x86_64-musl.tar.gz -C youki-0.3.2 
-sudo chmod 755 youki-0.3.2/youki
-mv youki-0.3.2/youki /usr/local/bin/runc
-rm -rf youki-0.3.2-x86_64-musl.tar.gz youki-0.3.2
+wget https://github.com/youki-dev/youki/releases/download/v0.4.1/youki-0.4.1-x86_64-musl.tar.gz
+mkdir youki-0.4.1 && tar -zxvf youki-0.4.1-x86_64-musl.tar.gz -C youki-0.4.1 
+sudo chmod 755 youki-0.4.1/youki
+mv youki-0.4.1/youki /usr/local/bin/runc
+rm -rf youki-0.4.1-x86_64-musl.tar.gz youki-0.4.1
 }
 ```
 
@@ -217,8 +217,8 @@ systemctl daemon-reload && systemctl enable containerd && systemctl start contai
 {
 cat <<EOF | tee kubeadm-config.yaml
 kind: ClusterConfiguration
-apiVersion: kubeadm.k8s.io/v1beta3
-kubernetesVersion: v1.30.0
+apiVersion: kubeadm.k8s.io/v1beta4
+kubernetesVersion: v1.31.2
 imageRepository: registry.aliyuncs.com/google_containers
 networking:
   dnsDomain: cluster.local
@@ -239,7 +239,7 @@ EOF
 kubeadm init --config kubeadm-config.yaml
 
 mkdir -p $HOME/.kube
-sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo cp /etc/kubernetes/super-admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 kubectl taint node --all node-role.kubernetes.io/control-plane:NoSchedule-
@@ -287,8 +287,8 @@ After running the `kubeadm init` and `kubeadm join` processes, the cluster looks
 ```
 root@master:~# kubectl get nodes
 NAME              STATUS     ROLES           AGE   VERSION
-master   NotReady   control-plane   28s   v1.30.0
-worker   NotReady   <none>          7s    v1.30.0
+master   NotReady   control-plane   28s   v1.31.2
+worker   NotReady   <none>          7s    v1.31.2
 root@master:~# kubectl get po -A
 NAMESPACE     NAME                                      READY   STATUS    RESTARTS   AGE
 kube-system   coredns-7bdc4cb885-g4wp2                  0/1     Pending   0          19s

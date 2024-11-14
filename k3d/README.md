@@ -3,7 +3,7 @@
 install specific release
 
 ```shell
-curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.6.3 bash
+curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=v5.7.4 bash
 ```
 
 install latest release
@@ -16,7 +16,7 @@ install kubectl if it is not already installed on the machine
 
 ```shell
 {
-wget -O /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/v1.30.0/bin/linux/amd64/kubectl
+wget -O /usr/local/bin/kubectl https://dl.k8s.io/release/v1.31.2/bin/linux/amd64/kubectl
 chmod +x /usr/local/bin/kubectl
 }
 ```
